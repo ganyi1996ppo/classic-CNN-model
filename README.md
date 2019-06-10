@@ -1,16 +1,16 @@
-# classic-CNN-model-PyTorch
+# Classic-CNN-Model-PyTorch
 reimplement classic CNN model and test on CIFAR-10 dataset
 
-##Prerequisites
+## Prerequisites
 
    * python 3.5+
    * pytorch 1.0+
    
-##License
+## License
 
 This project is released under the [MIT license](LICENSE)
 
-##Getting Started
+## Getting Started
 
 Please Choose the model you would like to use at ``train.py``, and using the model
 defined in the ``<classic-CNN-model dir>/models`` replace the variable ``model`` in the train.py
