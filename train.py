@@ -15,8 +15,6 @@ from models.LENet import *
 from models.VGG import *
 from models.resnet import *
 from models.mobileNet import *
-from models.resnext import *
-from models.SENet import *
 from models.ShuffleNet import *
 
 def parse_arg():
