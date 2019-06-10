@@ -16,6 +16,7 @@ from models.VGG import *
 from models.resnet import *
 from models.mobileNet import *
 from models.ShuffleNet import *
+from resnext import *
 
 def parse_arg():
     parse = argparse.ArgumentParser(description='the argument to config the training')
@@ -59,7 +60,9 @@ test_loader = data.DataLoader(test_dataset, batch_size = batch_size, num_workers
 #model = LENET()
 #model = resnet101()
 #model = MobileNetv1()
-model = ShuffleNetG3()
+#model = ShuffleNetG3()
+#model = VGG('vgg19')
+model = ResNext101()
 optimizer = optim.SGD(model.parameters(), lr= cfg.lr, momentum=0.9, weight_decay=0.0001)
 lr_schedule = optim.lr_scheduler.MultiStepLR(optimizer, [110, 160 ], 0.1)
 criterion = nn.CrossEntropyLoss()
