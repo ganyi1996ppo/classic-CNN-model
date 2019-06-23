@@ -2,6 +2,8 @@ import torch.utils.data as data
 import torch.nn as nn
 import torch.nn.functional as F
 import os
+import tqdm
+from tensorboardX import SummaryWriter
 import torch
 import numpy as np
 import argparse
@@ -28,7 +30,9 @@ def parse_arg():
 
     args = parse.parse_args()
     return args
-
+if not os.path.isdir('./log'):
+    os.makedirs('./log')
+writer = SummaryWriter(log_dir='./log', comment='Net')
 cfg = parse_arg()
 best_acc = 0
 batch_size = 128
@@ -57,12 +61,12 @@ test_dataset = torchvision.datasets.CIFAR10(root='./data',download = True,
                                                 train = False, transform = test_transform)
 test_loader = data.DataLoader(test_dataset, batch_size = batch_size, num_workers= 4)
 
-#model = LENET()
+model = LENET()
 #model = resnet101()
 #model = MobileNetv1()
 #model = ShuffleNetG3()
 #model = VGG('vgg19')
-model = ResNext101()
+#model = ResNext101()
 optimizer = optim.SGD(model.parameters(), lr= cfg.lr, momentum=0.9, weight_decay=0.0001)
 lr_schedule = optim.lr_scheduler.MultiStepLR(optimizer, [110, 160 ], 0.1)
 criterion = nn.CrossEntropyLoss()
@@ -87,6 +91,7 @@ def train(epoch):
     print('epoch{}\n'.format(epoch))
     lr_schedule.step()
     train_loss = 0
+    prediction = 0
     correct = 0
     num = 0
     model.train()
@@ -103,9 +108,12 @@ def train(epoch):
         correct += prediction.eq(target).sum().item()
         train_loss +=loss
         num += target.size(0)
+
         if i%100==0:
             print('epooch {} {}/{}: train accuracy: {}, train loss: {}'.format(epoch,i, len(train_loader),
                                                                                 correct/num,train_loss/num))
+    writer.add_scalar('scalar/train_loss', train_loss / num, epoch)
+    writer.add_scalar('scalar/train_precision', correct / num, epoch)
     print('epooch {} : train accuracy: {}, train loss: {}'.format(epoch, correct / num, train_loss / num))
 def test(epoch):
     global best_acc
@@ -125,6 +133,8 @@ def test(epoch):
             if i%100==0:
                 print('epoch {}|{}/{}: test accuray: {}, test loss: {}'.format(epoch,i,len(test_loader),
                                                                                correct/num,test_loss/num))
+        writer.add_scalar('scalar/test_loss', test_loss/num, epoch)
+        writer.add_scalar('scalar/test_precision', correct/num, epoch)
         print('epooch {} : train accuracy: {}, test loss: {}'.format(epoch, correct/num, test_loss/num))
         acc = correct/len(test_loader)
 
@@ -148,6 +158,7 @@ if __name__=='__main__':
         train(epoch)
         test(epoch)
         epoch+=1
+    writer.close()
 
 
 
